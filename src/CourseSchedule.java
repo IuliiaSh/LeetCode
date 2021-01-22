@@ -14,7 +14,6 @@ public class CourseSchedule {
         boolean isCycle;
         for (int i = 0; i < numCourses; i++) {
             if (!isVisited[i]) {
-            	isOnStack[nodes[i].val] = true;
             	isCycle = checkCycle(nodes[i], isOnStack, isVisited);
                 if (isCycle) {
                 	return false;
