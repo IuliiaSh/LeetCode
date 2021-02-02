@@ -1,74 +1,65 @@
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
+import java.util.Queue;
 
 public class MinimumHeightTrees {
 	public List<Integer> findMinHeightTrees(int n, int[][] edges) {
-        List<Integer> result = new ArrayList<Integer>();
-        if (n == 1) {
-            result.add(0);
-            return result;
-        } 
-        if (n == 2) {
-            result.add(0);
-            result.add(1);
-            return result;
-        } 
-        
-        Node[] nodes = new Node[n];
+	    List<Integer> result = new ArrayList<Integer>();
+		if (n == 1) {
+			result.add(0);
+			return result;
+		}
+		
+		Node[] nodes = new Node[n];
 		for (int i = 0; i < nodes.length; i++) {
 		    nodes[i] = new Node(i);
 		}
-		
+
 		for (int i = 0 ; i < edges.length; i++) {
 		    nodes[edges[i][0]].neighbors.add(nodes[edges[i][1]]);
 		    nodes[edges[i][1]].neighbors.add(nodes[edges[i][0]]);
 		}
 		
-		int minimumHeight = Integer.MAX_VALUE;
-		int currentHeight;
+		Queue<Node> currentNodes = new LinkedList<Node>();
 		for (int i = 0; i < nodes.length; i++) {
-		    if (nodes[i].neighbors.size() > 1) {
-		        currentHeight = getHeight(n, nodes[i], minimumHeight + 1);
-		        if (currentHeight == minimumHeight) {
-		            result.add(i);
-		        } else if (currentHeight < minimumHeight) {
-		    	    minimumHeight = currentHeight;
-		            result = new ArrayList<Integer>();
-		            result.add(i);
-		        }
+		    if (nodes[i].neighbors.size() == 1) {
+		    	currentNodes.add(nodes[i]);
 		    }
 		}
-		return result;
-    }
-    
-	private int getHeight(int n, Node root, int stopHeight) {
-        int result = 0;
-        Stack<Node> nodes = new Stack<Node>();
-        boolean[] isVisited = new boolean[n];
-        int[] heights = new int[n];
-        nodes.push(root);
-        heights[root.val] = 0;
-        Node node;
-        int height;
-        while (!nodes.isEmpty()) {
-            node = nodes.pop();
-            isVisited[node.val] = true;
-            
-            height = heights[node.val];
-            if (height == stopHeight) return Integer.MAX_VALUE;
-            	
-            if (height > result) {
-                result = height;
-            }
-            
-            for (Node neighbor : node.neighbors) {
-                if (!isVisited[neighbor.val]) {
-                    nodes.push(neighbor);
-                    heights[neighbor.val] = height + 1;
-                }
-            }
+		
+		int nodesLeft = n;
+		Queue<Node> previousNodes;
+		Node node;
+		Node parent;
+		boolean[] isOnQueue = new boolean[n];
+		while (nodesLeft > 2) {
+			previousNodes = currentNodes;
+			currentNodes = new LinkedList<Node>();
+			isOnQueue = new boolean[n];
+			while (!previousNodes.isEmpty()) {
+				node = previousNodes.remove();
+				if (!isOnQueue[node.val]) {
+					if (node.neighbors.size() == 1) {
+						nodesLeft--;
+						parent = node.neighbors.get(0);
+						parent.neighbors.remove(node);
+					
+						if (!isOnQueue[parent.val]) {
+							currentNodes.add(parent);
+							isOnQueue[parent.val] = true;
+						}
+					} else {
+						currentNodes.add(node);
+						isOnQueue[node.val] = true;
+					}
+				}
+			}
+		}
+		
+        while (!currentNodes.isEmpty()) {
+            result.add(currentNodes.remove().val);
         }
-        return result;
+		return result;
     }
 }
