@@ -15,6 +15,8 @@ public class SatisfiabilityOfEqualityEquations {
         Node second;
         for (String e : equations) {
             if (e.charAt(1) == '!') {
+                if (e.charAt(0) == e.charAt(3)) return false;
+                
                 nonEquality.add(e);
             } else {
                 if (!nodes.containsKey(e.charAt(0))) nodes.put(e.charAt(0), new Node(e.charAt(0)));
@@ -69,3 +71,4 @@ class Node {
         componentId = 0;
     }
 }
+
